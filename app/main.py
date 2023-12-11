@@ -76,6 +76,15 @@ def update_category(id):
     
     return category_schema.jsonify(updatecategory)
 
+# DELETE ##################################
+@app.route("/category/<id>", methods=["DELETE"])
+def delete_category(id):
+    deletecategory = Category.query.get(id)
+    
+    db.session.delete(deletecategory)
+    db.session.commit()
+    return category_schema.jsonify(deletecategory)
+
 #welcome message
 @app.route("/", methods=["GET"])
 def index():
