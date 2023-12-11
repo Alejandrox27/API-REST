@@ -14,11 +14,11 @@ ma = Marshmallow(app)
 # creation Table
 class Category(db.Model):
     cat_id = db.Column(db.Integer, primary_key=True)
-    cat_nom = db.Column(db.String(100))
+    cat_name = db.Column(db.String(100))
     cat_desp = db.Column(db.String(100))
     
-    def __init__(self, cat_nom, cat_desp):
-        self.cat_nom = cat_nom
+    def __init__(self, cat_name, cat_desp):
+        self.cat_name = cat_name
         self.cat_desp = cat_desp
         
 with app.app_context():
@@ -27,7 +27,7 @@ with app.app_context():
 #schema
 class CategorySchema(ma.Schema):
     class Meta:
-        fields = ("cat_id", "cat_nom", "cat_desp")
+        fields = ("cat_id", "cat_name", "cat_desp")
 # one response
 category_schema = CategorySchema()
 # multiple responses
@@ -50,6 +50,7 @@ def get_category_by_id(id):
 # POST ###################################
 @app.route("/category", methods=["POST"])
 def insert_category():
+    data = request.get_json(force=True)
     cat_name = request.json["cat_name"]
     cat_desp = request.json["cat_desp"]
     
@@ -58,6 +59,22 @@ def insert_category():
     db.session.add(new_register)
     db.session.commit()
     return category_schema.jsonify(new_register)
+
+# PUT ####################################
+@app.route("/category/<id>", methods=["PUT"])
+def update_category(id):
+    updatecategory = Category.query.get(id)
+    
+    data = request.get_json(force=True)
+    cat_name = data["cat_name"]
+    cat_desp = data["cat_desp"]
+    
+    updatecategory.cat_name = cat_name
+    updatecategory.cat_desp = cat_desp
+    
+    db.session.commit()
+    
+    return category_schema.jsonify(updatecategory)
 
 #welcome message
 @app.route("/", methods=["GET"])
